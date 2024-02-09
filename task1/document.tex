@@ -27,7 +27,52 @@
 
 \includegraphics*[width=1\textwidth]{assets/er.pdf}
 
-TODO popisek ER diagramu.
+\subsection*{Item}
+\begin{itemize}
+    \item Generická entita položky, na základě které vznikají entity Book a
+    Magazine
+
+    \item \subsubsection*{Book}
+    \begin{itemize}
+        \item Entita specializující entitu Item
+        \item Představuje knihu uloženou v informačním systému
+    \end{itemize}
+
+    \item \subsubsection*{Magazine}
+    \begin{itemize}
+        \item Entita specializující entitu Item
+        \item Představuje časopis uložený v informačním systému
+    \end{itemize}
+\end{itemize}
+
+\subsection*{User}
+\begin{itemize}
+    \item Entita představující uživatele informačního systému
+    \item Na základě role se určuje, zda je to uživatel, zaměstnanec či admin
+\end{itemize}
+
+\subsection*{Receipt}
+\begin{itemize}
+    \item Entita reprezentující účtenky
+    \item V relaci s uživatelem, kterému byla účtenka vystavena
+\end{itemize}
+
+\subsection*{Borrowing}
+\begin{itemize}
+    \item Výpůjčky knih/časopisů jsou reprezentovýny touto entitou
+    \item V relaci s uživatelem, který si půjčil knihu/časopis
+    \item V relaci pouze s jednou knihou/časopisem za účelem prolužování
+    výpůjček
+\end{itemize}
+
+\subsection*{Reservation}
+\begin{itemize}
+    \item Rezervace knih/časopisů jsou představovány touto entitou
+    \item V relaci s uživatelem, který provedl rezervaci
+    \item Pouze jedna kniha/časopis v relaci
+    \item Obsahuje pořadí rezervace, které určuje pořadá uživatelů na vypůjčení
+    dané knihy/časopisu
+\end{itemize}
 
 \newpage
 

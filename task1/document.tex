@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
+\usepackage{pdfpages}
 
 \title{Title}
 \author{Author}
@@ -7,8 +8,16 @@
 
 \begin{document}
 
-\maketitle
+\section*{ER diagram}
 
-\section{Introduction}
+\includegraphics*[width=1\textwidth]{assets/er.pdf}
+
+\newpage
+
+\section*{Usecase diagram}
+
+\begin{center}
+    \includegraphics*[height=0.95\textheight]{assets/usecase.pdf}
+\end{center}
 
 \end{document}

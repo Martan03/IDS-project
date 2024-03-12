@@ -1,13 +1,13 @@
-DELETE TABLE IF EXISTS user;
-DELETE TABLE IF EXISTS item;
-DELETE TABLE IF EXISTS book;
-DELETE TABLE IF EXISTS magazine;
-DELETE TABLE IF EXISTS receipt;
-DELETE TABLE IF EXISTS borrowing;
-DELETE TABLE IF EXISTS reservation;
+DROP TABLE IF EXISTS magazine;
+DROP TABLE IF EXISTS book;
+DROP TABLE IF EXISTS receipt;
+DROP TABLE IF EXISTS borrowing;
+DROP TABLE IF EXISTS reservation;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS item;
 
-CREATE TABLE user (
-    id INT PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255),
     phone VARCHAR(255),
     name VARCHAR(255),
@@ -15,7 +15,7 @@ CREATE TABLE user (
 );
 
 CREATE TABLE item (
-    id INT PRIMARY KEY AUTOINCREMENT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255),
     release_date DATE,
     pages INT,
@@ -24,39 +24,46 @@ CREATE TABLE item (
 );
 
 CREATE TABLE book (
+    id INT,
     ISBN VARCHAR(13) PRIMARY KEY,
     author VARCHAR(255),
     FOREIGN KEY (id) REFERENCES item(id)
 );
 
 CREATE TABLE magazine (
-    ISSN VARCHAR(13), PRIMARY KEY,
+    id INT,
+    ISSN VARCHAR(13) PRIMARY KEY,
     part INT,
     publisher VARCHAR(255),
     FOREIGN KEY (id) REFERENCES item(id)
 );
 
 CREATE TABLE receipt (
-    id INT PRIMARY KEY AUTOINCREMENT,
+    users INT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     price NUMERIC(18, 2),
-    note CHARACTER VARYING(1024),
+    note VARCHAR(1024),
     paid NUMERIC(18, 2),
     issue_date DATE,
-    due_data DATA,
-    FOREIGN KEY (user) REFERENCES user(id)
+    due_date DATE,
+    FOREIGN KEY (users) REFERENCES users(id)
 );
 
 CREATE TABLE borrowing (
-    id INT PRIMARY KEY AUTOINCREMENT,
+    item INT,
+    users INT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     borrow_start DATE,
     borrow_end DATE,
     FOREIGN KEY (item) REFERENCES item(id),
-    FOREIGN KEY (user) REFERENCES user(id)
+    FOREIGN KEY (users) REFERENCES users(id)
 );
 
 CREATE TABLE reservation (
-    id INT PRIMARY KEY AUTOINCREMENT,
-    order INT,
-    FOREIGN KEY(user) REFERENCES user(id),
+    item INT,
+    users INT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    q_number INT,
+    FOREIGN KEY(users) REFERENCES users(id),
     FOREIGN KEY(item) REFERENCES item(id)
 );

@@ -1,13 +1,13 @@
-DROP TABLE IF EXISTS magazine;
-DROP TABLE IF EXISTS book;
-DROP TABLE IF EXISTS receipt;
-DROP TABLE IF EXISTS borrowing;
-DROP TABLE IF EXISTS reservation;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS item;
+DROP TABLE magazine;
+DROP TABLE book;
+DROP TABLE receipt;
+DROP TABLE borrowing;
+DROP TABLE reservation;
+DROP TABLE users;
+DROP TABLE item;
 
 CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     email VARCHAR(255),
     phone VARCHAR(255),
     name VARCHAR(255),
@@ -15,7 +15,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE item (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     title VARCHAR(255),
     release_date DATE,
     pages INT,
@@ -23,10 +23,25 @@ CREATE TABLE item (
     available_count INT
 );
 
+-- Checks if given ISBN is valid
+CREATE OR REPLACE FUNCTION check_isbn (isbn IN CHAR) RETURN BOOLEAN IS
+    digit_sum INT := 0;
+    val INT := 0;
+BEGIN
+    FOR i IN 1..13 LOOP
+        val := CASE WHEN MOD(i, 2) = 0 THEN 3 ELSE 1 END;
+        digit_sum := digit_sum + TO_NUMBER(SUBSTR(isbn, i, 1)) * val;
+    END LOOP;
+
+    return MOD(digit_sum, 10) = 0;
+END;
+/
+
 CREATE TABLE book (
-    isbn VARCHAR(13) PRIMARY KEY,
+    isbn CHAR(13) PRIMARY KEY,
     author VARCHAR(255),
     id INT,
+    CONSTRAINT isbn_constraint CHECK(check_isbn(isbn)),
     FOREIGN KEY (id) REFERENCES item(id)
 );
 
@@ -39,7 +54,7 @@ CREATE TABLE magazine (
 );
 
 CREATE TABLE receipt (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     price NUMERIC(18, 2),
     note VARCHAR(1024),
     paid NUMERIC(18, 2),
@@ -50,7 +65,7 @@ CREATE TABLE receipt (
 );
 
 CREATE TABLE borrowing (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     borrow_start DATE,
     borrow_end DATE,
     item INT,
@@ -60,7 +75,7 @@ CREATE TABLE borrowing (
 );
 
 CREATE TABLE reservation (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     q_number INT,
     item INT,
     users INT,
@@ -70,13 +85,14 @@ CREATE TABLE reservation (
 
 INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
     'Pán prstenů: Společenstvo Prstenu',
-    '1990-01-01',
+    TO_DATE('1990-01-01', 'yyyy-mm-dd'),
     473,
     12,
     12
-), (
+);
+INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
     'Pán prstenů: Dvě věže',
-    '1991-01-01',
+    TO_DATE('1991-01-01', 'yyyy-mm-dd'),
     315,
     1,
     0
@@ -86,7 +102,8 @@ INSERT INTO book (author, isbn, id) VALUES (
     'J. R. R. Tolkien',
     '9788020409256',
     1
-), (
+);
+INSERT INTO book (author, isbn, id) VALUES (
     'J. R. R. Tolkien',
     '9788020409355',
     2
@@ -97,12 +114,14 @@ INSERT INTO users (email, phone, name, role) VALUES (
     '123654789',
     'Jan Novák',
     'CLIENT'
-), (
+);
+INSERT INTO users (email, phone, name, role) VALUES (
     'pavel.koci@gmail.com',
     '321456987',
     'Pavel Kočí',
     'CLIENT'
-), (
+);
+INSERT INTO users (email, phone, name, role) VALUES (
     'ferdinand.ingerle@gmail.com',
     '123789654',
     'Ferndinand Ingerle',
@@ -110,13 +129,14 @@ INSERT INTO users (email, phone, name, role) VALUES (
 );
 
 INSERT INTO borrowing (borrow_start, borrow_end, item, users) VALUES (
-    '2024-03-10',
-    '2024-03-25',
+    TO_DATE('2024-03-10', 'yyyy-mm-dd'),
+    TO_DATE('2024-03-25', 'yyyy-mm-dd'),
     2,
     1
-), (
-    '2024-02-20',
-    '2024-03-01',
+);
+INSERT INTO borrowing (borrow_start, borrow_end, item, users) VALUES (
+    TO_DATE('2024-02-20', 'yyyy-mm-dd'),
+    TO_DATE('2024-03-01', 'yyyy-mm-dd'),
     1,
     2
 );
@@ -125,8 +145,8 @@ INSERT INTO receipt (price, note, paid, issue_date, due_date, users) VALUES (
     50,
     'Pozdní vrácení',
     50,
-    '2024-03-02',
-    '2024-03-09',
+    TO_DATE('2024-03-02', 'yyyy-mm-dd'),
+    TO_DATE('2024-03-09', 'yyyy-mm-dd'),
     2
 );
 

@@ -24,7 +24,7 @@ CREATE TABLE item (
 );
 
 -- Checks if given ISBN is valid
-CREATE OR REPLACE FUNCTION check_isbn (isbn IN CHAR) RETURN BOOLEAN IS
+CREATE OR REPLACE FUNCTION CHECK_FUCKING_ISBN (isbn IN CHAR) RETURN BOOLEAN IS
     digit_sum INT := 0;
     val INT := 0;
 BEGIN
@@ -40,17 +40,16 @@ END;
 CREATE TABLE book (
     isbn CHAR(13) PRIMARY KEY,
     author VARCHAR(255),
-    id INT,
-    CONSTRAINT isbn_constraint CHECK(check_isbn(isbn)),
-    FOREIGN KEY (id) REFERENCES item(id)
+    item_id INT,
+    FOREIGN KEY (item_id) REFERENCES item(id)
 );
 
 CREATE TABLE magazine (
     issn VARCHAR(13) PRIMARY KEY,
     part INT,
     publisher VARCHAR(255),
-    id INT,
-    FOREIGN KEY (id) REFERENCES item(id)
+    item_id INT,
+    FOREIGN KEY (item_id) REFERENCES item(id)
 );
 
 CREATE TABLE receipt (
@@ -97,16 +96,43 @@ INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
     1,
     0
 );
+INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
+    'Hraničářův učeň: Rozvaliny Gorlanu',
+    TO_DATE('2004', 'yyyy'),
+    267,
+    5,
+    4
+);
+INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
+    'Čtyřlístek: Do středu země',
+    TO_DATE('2024-03', 'yyyy-mm'),
+    36,
+    3,
+    2
+);
 
-INSERT INTO book (author, isbn, id) VALUES (
+
+INSERT INTO book (author, isbn, item_id) VALUES (
     'J. R. R. Tolkien',
     '9788020409256',
     1
 );
-INSERT INTO book (author, isbn, id) VALUES (
+INSERT INTO book (author, isbn, item_id) VALUES (
     'J. R. R. Tolkien',
     '9788020409355',
     2
+);
+INSERT INTO book (author, isbn, item_id) VALUES (
+    'John Flanagan',
+    '9788025209905',
+    3
+);
+
+INSERT INTO magazine (issn, part, publisher, item_id) VALUES (
+    '12114219',
+    '752',
+    'Čtyřlístek s.r.o.',
+    4
 );
 
 INSERT INTO users (email, phone, name, role) VALUES (
@@ -140,6 +166,18 @@ INSERT INTO borrowing (borrow_start, borrow_end, item, users) VALUES (
     1,
     2
 );
+INSERT INTO borrowing (borrow_start, borrow_end, item, users) VALUES (
+    TO_DATE('2024-03-20', 'yyyy-mm-dd'),
+    TO_DATE('2024-04-03', 'yyyy-mm-dd'),
+    3,
+    3
+);
+INSERT INTO borrowing (borrow_start, borrow_end, item, users) VALUES (
+    TO_DATE('2024-03-21', 'yyyy-mm-dd'),
+    TO_DATE('2024-04-02', 'yyyy-mm-dd'),
+    4,
+    2
+);
 
 INSERT INTO receipt (price, note, paid, issue_date, due_date, users) VALUES (
     50,
@@ -154,4 +192,9 @@ INSERT INTO reservation (q_number, item, users) VALUES (
     1,
     2,
     3
+);
+INSERT INTO reservation(q_number, item, users) VALUES (
+    2,
+    2,
+    1
 );

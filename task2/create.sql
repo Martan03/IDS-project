@@ -14,6 +14,10 @@ CREATE TABLE users (
     role VARCHAR(255)
 );
 
+-- The specialization of `item` into `book` and `magazine` is done by 3 tables:
+--   `item` - contains the common data for `book` and `magazine`
+--   `book` - contains the data specific to `book` and id of the `item`
+--   `magazine` - contains the data specific to `magazine` and id of the `item`
 CREATE TABLE item (
     id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     title VARCHAR(255),

@@ -11,7 +11,13 @@ CREATE TABLE users (
     email VARCHAR(255),
     phone VARCHAR(255),
     name VARCHAR(255),
-    role VARCHAR(255)
+    role VARCHAR(255),
+    CONSTRAINT check_email CHECK (
+        REGEXP_LIKE(
+            email,
+            '^[A-Za-z0-9._%+-]+@([A-Za-z0-9.-]+\.)+[A-Za-z]{2,}$'
+        )
+    )
 );
 
 -- The specialization of `item` into `book` and `magazine` is done by 3 tables:
@@ -22,9 +28,9 @@ CREATE TABLE item (
     id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
     title VARCHAR(255),
     release_date DATE,
-    pages INT,
-    count INT,
-    available_count INT
+    pages INT CHECK (pages > 0),
+    count INT CHECK (count >= 0),
+    available_count INT CHECK (available_count >= 0)
 );
 
 CREATE TABLE book (
@@ -52,8 +58,8 @@ CREATE TABLE book (
 );
 
 CREATE TABLE magazine (
-    issn VARCHAR(13) PRIMARY KEY,
-    part INT,
+    issn CHAR(13) PRIMARY KEY,
+    part INT CHECK (part > 0),
     publisher VARCHAR(255),
     item_id INT,
     FOREIGN KEY (item_id) REFERENCES item(id)
@@ -61,7 +67,7 @@ CREATE TABLE magazine (
 
 CREATE TABLE receipt (
     id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
-    price NUMERIC(18, 2),
+    price NUMERIC(18, 2) CHECK (price >= 0),
     note VARCHAR(1024),
     paid NUMERIC(18, 2),
     issue_date DATE,
@@ -82,7 +88,7 @@ CREATE TABLE borrowing (
 
 CREATE TABLE reservation (
     id INT GENERATED ALWAYS as IDENTITY PRIMARY KEY,
-    q_number INT,
+    q_number INT CHECK (q_number > 0),
     item INT,
     users INT,
     FOREIGN KEY(users) REFERENCES users(id),

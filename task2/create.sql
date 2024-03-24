@@ -27,24 +27,27 @@ CREATE TABLE item (
     available_count INT
 );
 
--- Checks if given ISBN is valid
-CREATE OR REPLACE FUNCTION CHECK_FUCKING_ISBN (isbn IN CHAR) RETURN BOOLEAN IS
-    digit_sum INT := 0;
-    val INT := 0;
-BEGIN
-    FOR i IN 1..13 LOOP
-        val := CASE WHEN MOD(i, 2) = 0 THEN 3 ELSE 1 END;
-        digit_sum := digit_sum + TO_NUMBER(SUBSTR(isbn, i, 1)) * val;
-    END LOOP;
-
-    return MOD(digit_sum, 10) = 0;
-END;
-/
-
 CREATE TABLE book (
     isbn CHAR(13) PRIMARY KEY,
     author VARCHAR(255),
     item_id INT,
+    CONSTRAINT check_isbn_sum CHECK (
+        MOD((
+            SUBSTR(ISBN, 1, 1) * 1 +
+            SUBSTR(ISBN, 2, 1) * 3 +
+            SUBSTR(ISBN, 3, 1) * 1 +
+            SUBSTR(ISBN, 4, 1) * 3 +
+            SUBSTR(ISBN, 5, 1) * 1 +
+            SUBSTR(ISBN, 6, 1) * 3 +
+            SUBSTR(ISBN, 7, 1) * 1 +
+            SUBSTR(ISBN, 8, 1) * 3 +
+            SUBSTR(ISBN, 9, 1) * 1 +
+            SUBSTR(ISBN, 10, 1) * 3 +
+            SUBSTR(ISBN, 11, 1) * 1 +
+            SUBSTR(ISBN, 12, 1) * 3 +
+            SUBSTR(ISBN, 13, 1) * 1
+        ), 10) = 0
+    ),
     FOREIGN KEY (item_id) REFERENCES item(id)
 );
 

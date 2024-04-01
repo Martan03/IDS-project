@@ -200,6 +200,14 @@ INSERT INTO receipt (price, note, paid, issue_date, due_date, users) VALUES (
     TO_DATE('2024-03-09', 'yyyy-mm-dd'),
     2
 );
+INSERT INTO receipt (price, note, paid, issue_date, due_date, users) VALUES (
+    50,
+    'Pozdní vrácení',
+    0,
+    TO_DATE('2024-03-02', 'yyyy-mm-dd'),
+    TO_DATE('2024-03-09', 'yyyy-mm-dd'),
+    3
+);
 
 INSERT INTO reservation (q_number, item, users) VALUES (
     1,

@@ -10,12 +10,10 @@ FROM item i, magazine m
 WHERE i.id = m.item_id;
 
 -- Combining three tables:
--- Users that are first in reservation queue and have not paid all receipts
-SELECT u.*, res.*, r.*
-FROM users u
-JOIN reservation res ON res.users = u.id
-JOIN receipt r ON r.users = u.id
-WHERE r.price <> r.paid AND res.q_number = 1
+-- Users that are first in reservation queue for all relevant items
+SELECT u.*, r.*, i.*
+FROM users u, reservation r, item i
+WHERE r.users = u.id AND i.id = r.item AND r.q_number = 1;
 
 -- Select containing GROUP BY and aggregation function
 -- Gets average price payed by each user
@@ -30,10 +28,10 @@ FROM item i
 LEFT JOIN reservation r ON r.item = i.id
 GROUP BY i.id, i.title;
 
--- Number of not payed receipts of each user
+-- Users that haven't paid receipt(s) and how many
 SELECT u.id, u.name, COUNT(*) AS not_payed
-FROM receipt r, users u
-WHERE r.price <> r.paid AND u.id = r.users
+FROM users u, receipt r
+WHERE r.price <> r.paid AND r.users = u.id
 GROUP BY u.id, u.name
 ORDER BY not_payed;
 

@@ -107,7 +107,7 @@ INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
     TO_DATE('1991-01-01', 'yyyy-mm-dd'),
     315,
     1,
-    0
+    1
 );
 INSERT INTO item (title, release_date, pages, count, available_count) VALUES (
     'Hraničářův učeň: Rozvaliny Gorlanu',

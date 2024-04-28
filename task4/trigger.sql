@@ -1,3 +1,5 @@
+-- Two triggers
+
 -- When borrowing start and end date isn't set, it is automatically assigned.
 -- borrow_start is set to current date and borrow_end to that + 14 days
 -- item's available_count is descreased by one
@@ -97,6 +99,10 @@ BEGIN
 END;
 /
 
+-- Two procedures where cursor is used, exception handling and variable usage
+-- with date type referencing row or column of the table
+-- Note: we created 3 procedures
+
 -- Gets information about all users with given role
 CREATE OR REPLACE PROCEDURE get_users_by_role(
     p_role IN users.role%TYPE
@@ -127,6 +133,8 @@ EXCEPTION
 END;
 /
 
+-- Inserts book to the database
+-- If book already exists, count is increased by cnt, same for available_count
 CREATE OR REPLACE PROCEDURE insert_book(
     qisbn IN book.isbn%TYPE,
     author IN book.author%TYPE,
@@ -167,6 +175,9 @@ EXCEPTION
 END;
 /
 
+-- Inserts magazine to the database
+-- If magazine already exists, count is increased by cnt, same for
+-- available_count
 CREATE OR REPLACE PROCEDURE insert_magazine(
     qissn IN magazine.issn%TYPE,
     part IN magazine.part%TYPE,
@@ -209,18 +220,20 @@ EXCEPTION
 END;
 /
 
-SET SERVEROUTPUT ON;
-
+-- Tests borrowing_inc_cnt trigger
 INSERT INTO borrowing (item, users) VALUES (
     2,
     3
 );
 
+-- Tests borrowing return trigger
 DELETE FROM borrowing
 WHERE id = 2;
 
+-- Tests procedures
+SET SERVEROUTPUT ON;
 BEGIN
-    -- get_users_by_role('WORKER');
+    get_users_by_role('WORKER');
 
     insert_book(
         '9788085951707',
@@ -243,6 +256,11 @@ BEGIN
 END;
 /
 
+-- Creation of Index and usage of EXPLAIN PLAN
+-- Query has to contain join of at least two tables, aggregation function and
+-- GROUP BY
+
+-- Gets each author book page sum after year 1995
 EXPLAIN PLAN FOR
     SELECT SUM(i.pages) AS total_pages, b.author
     FROM book b
@@ -250,11 +268,16 @@ EXPLAIN PLAN FOR
     WHERE i.release_date >= TO_DATE('YY', '95')
     GROUP BY b.author;
 
+-- Prints the database plan
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Index creation - index is set to release_date on the item table
+DROP INDEX book_author_index;
 
 CREATE INDEX book_author_index
 ON item (release_date);
 
+-- Tries same select with the index
 EXPLAIN PLAN FOR
     SELECT SUM(i.pages) AS total_pages, b.author
     FROM book b
@@ -262,21 +285,31 @@ EXPLAIN PLAN FOR
     WHERE i.release_date >= TO_DATE('YY', '95')
     GROUP BY b.author;
 
+-- Prints the database plan
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
-GRANT SELECT ON item TO xstigl00;
-GRANT SELECT ON book TO xstigl00;
-GRANT SELECT ON magazine TO xstigl00;
+-- Grants access rights for the second team member
+GRANT SELECT, INSERT, UPDATE ON item TO xstigl00;
+GRANT SELECT, INSERT, UPDATE ON book TO xstigl00;
+GRANT SELECT, INSERT, UPDATE ON magazine TO xstigl00;
 
-SELECT title,
-CASE
-    WHEN pages > 1000 THEN 'Very long'
-    WHEN pages > 400 THEN 'Long'
-    WHEN pages > 100 THEN 'Medium'
-    ELSE 'Short'
-END AS length
-FROM item;
+-- Creates materialized view
+-- This should be executed from the second team member
+DROP MATERIALIZED VIEW book_item;
 
+CREATE MATERIALIZED VIEW book_item AS
+    SELECT i.*, b.*
+    FROM xsleza26.item i, xsleza26.book b
+    WHERE i.id = b.item_id;
+
+-- Selects book from the view
+SELECT id, title, author, pages
+FROM book_item;
+
+-- Select using WITH and CASE
+-- Select user id, user and status of his return history
+-- Return history is set based on number of times he return borrowing later
+-- and how much later he returned it
 SELECT u.id, u.name, (AVG(r.price) / 5) as avg_days_late, COUNT(*) as late_cnt,
 CASE
     WHEN COUNT(*) = 0 THEN 'Excelent'

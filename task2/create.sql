@@ -58,7 +58,7 @@ CREATE TABLE book (
 );
 
 CREATE TABLE magazine (
-    issn CHAR(13) PRIMARY KEY,
+    issn CHAR(13) PRIMARY KEY   ,
     part INT CHECK (part > 0),
     publisher VARCHAR(255),
     item_id INT,
